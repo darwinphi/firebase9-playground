@@ -2,7 +2,13 @@ import { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { Formik } from "formik";
 
 const firebaseConfig = {
@@ -20,18 +26,28 @@ const db = getFirestore();
 
 const colRef = collection(db, "users");
 
-getDocs(colRef)
-  .then((snapshot) => {
-    console.log(snapshot.docs);
+// getDocs(colRef)
+//   .then((snapshot) => {
+//     console.log(snapshot.docs);
 
-    let users = [];
-    snapshot.docs.forEach((doc) => {
-      users.push({ ...doc.data(), id: doc.id });
-    });
+//     let users = [];
+//     snapshot.docs.forEach((doc) => {
+//       users.push({ ...doc.data(), id: doc.id });
+//     });
 
-    console.log(users);
-  })
-  .catch((err) => console.log(err));
+//     console.log(users);
+//   })
+//   .catch((err) => console.log(err));
+
+// Real time collection
+onSnapshot(colRef, (snapshot) => {
+  let users = [];
+  snapshot.docs.forEach((doc) => {
+    users.push({ ...doc.data(), id: doc.id });
+  });
+
+  console.log(users);
+});
 
 const Basic = () => (
   <div>
