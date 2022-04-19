@@ -2,6 +2,7 @@ import { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-YW6A6yxKOCrVOuQHAxQTqiYPRLoyBHc",
@@ -13,6 +14,23 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig);
+
+const db = getFirestore();
+
+const colRef = collection(db, "users");
+
+getDocs(colRef)
+  .then((snapshot) => {
+    console.log(snapshot.docs);
+
+    let users = [];
+    snapshot.docs.forEach((doc) => {
+      users.push({ ...doc.data(), id: doc.id });
+    });
+
+    console.log(users);
+  })
+  .catch((err) => console.log(err));
 
 function App() {
   const [count, setCount] = useState(0);
