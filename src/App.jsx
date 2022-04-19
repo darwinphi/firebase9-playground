@@ -2,7 +2,8 @@ import { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import { Formik } from "formik";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-YW6A6yxKOCrVOuQHAxQTqiYPRLoyBHc",
@@ -32,12 +33,75 @@ getDocs(colRef)
   })
   .catch((err) => console.log(err));
 
-function App() {
-  const [count, setCount] = useState(0);
+const Basic = () => (
+  <div>
+    <h1>Add User</h1>
+    <Formik
+      initialValues={{ email: "", name: "" }}
+      validate={(values) => {
+        const errors = {};
+        if (!values.email) {
+          errors.email = "Required";
+        } else if (
+          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+        ) {
+          errors.email = "Invalid email address";
+        }
+        return errors;
+      }}
+      onSubmit={({ email, name }, { setSubmitting }) => {
+        setTimeout(() => {
+          addDoc(colRef, {
+            email,
+            name,
+          });
+          setSubmitting(false);
+        }, 400);
+      }}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isSubmitting,
+        /* and other goodies */
+      }) => (
+        <form onSubmit={handleSubmit}>
+          <p>Email</p>
+          <input
+            type="email"
+            name="email"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.email}
+          />
+          {errors.email && touched.email && errors.email}
+          <p>Name</p>
+          <input
+            type="text"
+            name="name"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.name}
+          />
+          {errors.name && touched.name && errors.name}
+          <button type="submit" disabled={isSubmitting}>
+            Submit
+          </button>
+        </form>
+      )}
+    </Formik>
+  </div>
+);
 
+function App() {
   return (
     <>
       <h1>Hello, world</h1>
+      <Basic />
     </>
   );
 }
