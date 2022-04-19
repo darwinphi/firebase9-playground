@@ -8,6 +8,8 @@ import {
   getDocs,
   addDoc,
   onSnapshot,
+  query,
+  where,
 } from "firebase/firestore";
 import { Formik } from "formik";
 
@@ -39,8 +41,11 @@ const colRef = collection(db, "users");
 //   })
 //   .catch((err) => console.log(err));
 
+// Query
+const q = query(colRef, where("name", "==", "Darwin"));
+
 // Real time collection
-onSnapshot(colRef, (snapshot) => {
+onSnapshot(q, (snapshot) => {
   let users = [];
   snapshot.docs.forEach((doc) => {
     users.push({ ...doc.data(), id: doc.id });
